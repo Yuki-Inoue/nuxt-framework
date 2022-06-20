@@ -6,7 +6,6 @@ import { logger, isIgnored } from '@nuxt/kit'
 import type { Options } from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
 import { sanitizeFilePath } from 'mlly'
-import { getPort } from 'get-port-please'
 import { buildClient } from './client'
 import { buildServer } from './server'
 import virtual from './plugins/virtual'
@@ -27,12 +26,6 @@ export interface ViteBuildContext {
 }
 
 export async function bundle (nuxt: Nuxt) {
-  const hmrPortDefault = 24678 // Vite's default HMR port
-  const hmrPort = await getPort({
-    port: hmrPortDefault,
-    ports: Array.from({ length: 20 }, (_, i) => hmrPortDefault + 1 + i)
-  })
-
   const ctx: ViteBuildContext = {
     nuxt,
     config: vite.mergeConfig(
@@ -78,12 +71,6 @@ export async function bundle (nuxt: Nuxt) {
         server: {
           watch: {
             ignored: isIgnored
-          },
-          hmr: {
-            // https://github.com/nuxt/framework/issues/4191
-            protocol: 'ws',
-            clientPort: hmrPort,
-            port: hmrPort
           },
           fs: {
             allow: [
